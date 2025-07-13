@@ -17,6 +17,9 @@ IMPORTANT NOTES:
     - only T0 will have a non-zero value for Z_Offset, ALL OTHER TOOLS HAVE Z_Offset = 0
     - gcode offsets are what is used to account for the offsets of T1-Tn, and these are offsets from T0
     - as such, it is crucially important that you are careful and ensure you have the correct Z_Offset for T0, otherwise all of your tools will be off
+- This guide assumes that you have gotten past the important step of setting up your slicer for a multi-toolhead print and have been able to test this functionality 
+  (testing only occurs once you have established a final T0 Z_Offset!)
+- This guide assumes that you have a display that you can use to open the "fine tuning" menu to make mid print adjustments, if you don't then you will need to sort out on your own how to do that
 
 
 -----------------------------------------------------------
@@ -126,6 +129,15 @@ Next, we can verify that our offsets are where we want them for T0
 If you made it this far successfully, consider this a waypoint in your journey, what I mean is that if you mess up at any point past this in the process you can simply erase all of your
 gcode offsets (of course leave the Z_Offset value for T0 alone!) and start over from this point!
 
+-----------------------------------------------------------
+Now is a good time to get that slicer figured out:
+-----------------------------------------------------------
+
+- Though it goes beyond the scope of this guide, at this point if you have not already done so, you should pause to figure out setting up your slicer for multi tool printing
+- It may take a few tries to get things right, but you should not continue until you have shown that you can run a print that at least performs the T0 --> T1 tool change mid print
+    - VERY IMPORTANT NOTE: if you're testing that now it is crucially important to stop the print before the printer actually tries to print with T1, otherwise you run the risk of crashing 
+      into the print surface!!!
+
 
 -----------------------------------------------------------
 Now for T1 through Tn:
@@ -140,6 +152,7 @@ Here's where it will begin to get confusing, as mentioned earlier:
 So now we need to find that offset for each tool. Here are some notes before we begin:
 
 - I am adding one or two "unnecessary" steps to ease in understanding what these offsets mean
+- Though it may be quicker to try and do this for multiple toolheads simultaneously, the first time you are probably better off completing the entire process for each extra toolhead beyond T0
 
 -----------------------------------------------------------
 Procedure for Tn:
@@ -172,8 +185,39 @@ A few important notes before continuing:
     - manually swap back to T0
     - re-home using T0
     - manually swap back to Tn
-
+- There are a number of techniques to determining these offsets, and you will see that a lot of folks are using a touchpoint-type (ie sexbolt or "sexball") sensors for this purpose, I myself
+  use a "sexball" probe and use the automated macros that come as part of klipper toolchanger to determine gcode offsets
+- While extra sensors and probes are useful and really quite convenient compared to the manual approach, I personally found them to only really be valuable tools once I fully understood what
+  the offsets are, what they represent, and how to measure them, so even if you plan to use another sensor for this I believe there is value in using this guide to understand it all, if for 
+  no other reason use what you find here to perform your sanity checks and verifications that the offsets you entered are good.
 
 Now to actually determine the offset:
+- Assuming that you have homed with T0 and manually swapped Tn back on as starting conditions
+- Command the tool to Z = 10mm (or another value that will for sure result in a nozzle above the print surface)
+- With a piece of paper ready, manually move the toolhead down along the Z axis until you have positioned the nozzle such that you can still move a piece of paper between it and the bed,
+  with the same slight amount of friction as you encountered above, this doesn't need to be super precise, again because we have to account for the paper
+- In my case, I determined in the check above that Tn's nozzle sits below T0's (so positive gcode offset), and arrived at an offset here of 0.6mm
+- Once here, go to Tn's config and set the gcode_z_offset value to the value found in the steps above, recalling the notes about signs
+- Manually swap back to T0, save your config which restarts klipper, ensure your temps are all set again after restarting
 
+A few quick notes about gcode offsets:
+- These are offsets that get applied during the tool change process
+- Recall that they are the offset relative to T0
+- Recall that this is why you must always home with T0 (following this guide, at least)
+- What this all translates to is, examine the following scenario: you start a print with T0 selected, T0 finishes all of its printing for the current layer and a toolchange occurs selecting T1
+    - When T1 is selected, the toolchanger looks at the gcode_z_offset value and applies it as an offset to Z positions while this tool is selected
+    - If you have ever used the "fine tuning" menu mid print to adjust Z offsets, the gcode_z_offset is applied to the current Z position in the same way as your printer applies offsets set
+      using the fine tuning menu
+    - You can see this happening as your print executes, when you start with T0, you can open the "fine tuning" menu and see that there is no offset being applied, however open the menu again
+      once the toolchange occurs and Tn is selected and you will see the value you entered under gcode_z_offset listed there as being applied currently to Z positions
+          - This in particular is useful for babystepping Tn
+
+Babystepping to account for the paper:
+- Once again we need to babystep to account for the paper in the process above
+- There are a number of ways to do this, here is how I go about it (note that the other methods are likely more efficient, I simply like to see everything as it happens)
+    - Create a test print in your slicer that only uses Tn, Ellis's test patches are a personal favorite to use, but sometimes I throw other test prints into the mix
+    - Ensure that T0 is selected and start the print
+    - If everything was setup correctly, your printer should work through your PRINT_START macro as normal using T0, then upon completing the startup procedure it will select Tn
+    - BE READY TO ESTOP you don't want to find out too late that you made a decimal point error here!
+    - Babystep your Z offset using the "fine tuning" menu 
 
