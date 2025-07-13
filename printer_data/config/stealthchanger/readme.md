@@ -139,7 +139,7 @@ Here's where it will begin to get confusing, as mentioned earlier:
 
 So now we need to find that offset for each tool. Here are some notes before we begin:
 
-- I am adding a few "unnecessary" steps to ease in understanding what these offsets mean
+- I am adding one or two "unnecessary" steps to ease in understanding what these offsets mean
 
 -----------------------------------------------------------
 Procedure for Tn:
@@ -164,6 +164,8 @@ The first thing we're going to do is to determine whether Tn's nozzle is positio
 While this step is not entirely necessary, it is a good sanity check, since it determines what the sign will be in front of your gcode Z offset:
 - if Tn's nozzle is BELOW T0's nozzle the sign is positive (+)
 - if Tn's nozzle is ABOVE T0's nozzle the sign is positive (-)
+- Think of it as a positive gcode offset means that you need to move Tn on the Z axis in the positive Z direction (up) in order to have the nozzle be at the print surface and 
+  a negative gcode offset means that you need to move Tn on the Z axis in the negative direction (down) in order to have the nozzle be at the print surface
 
 A few important notes before continuing:
 - If you followed the steps above and triggered the tap sensor during the process it will be necessary for you to do the following before continuing:
