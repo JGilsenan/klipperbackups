@@ -129,6 +129,7 @@ Next, we can verify that our offsets are where we want them for T0
 If you made it this far successfully, consider this a waypoint in your journey, what I mean is that if you mess up at any point past this in the process you can simply erase all of your
 gcode offsets (of course leave the Z_Offset value for T0 alone!) and start over from this point!
 
+
 -----------------------------------------------------------
 Now is a good time to get that slicer figured out:
 -----------------------------------------------------------
@@ -153,6 +154,7 @@ So now we need to find that offset for each tool. Here are some notes before we 
 
 - I am adding one or two "unnecessary" steps to ease in understanding what these offsets mean
 - Though it may be quicker to try and do this for multiple toolheads simultaneously, the first time you are probably better off completing the entire process for each extra toolhead beyond T0
+
 
 -----------------------------------------------------------
 Procedure for Tn:
@@ -219,5 +221,27 @@ Babystepping to account for the paper:
     - Ensure that T0 is selected and start the print
     - If everything was setup correctly, your printer should work through your PRINT_START macro as normal using T0, then upon completing the startup procedure it will select Tn
     - BE READY TO ESTOP you don't want to find out too late that you made a decimal point error here!
-    - Babystep your Z offset using the "fine tuning" menu 
+    - Babystep your Z offset using the "fine tuning" menu until you have achieved a Z offset you like (good squish)
+    - Here's my favorite part, because the way that gcode_z_offset is applied by the toolchanger is the same as how the "fine tuning" menu does it, the value displayed once you dial it in
+      is the new value that you need to enter under Tn for gcode_z_offset, note this value somewhere
+    - Next, cancel the print or let it finish, your choice, and use the toolchanger to select T0 again if it did not do so as part of your PRINT_END macro
+    - Now go to your configs, update the gcode_z_offset value for Tn, then save and restart the printer, making sure to set your temps again
+
+Don't forget the sanity check print:
+- You could stop here, but I personally don't enjoy surprises, so I do a sanity check print
+- I typically use the same job as I did for babystepping above, and rerun it while I watch to make sure I didn't accidentally enter the wrong gcode_z_offset
+- Once this has been confirmed, congrats, you can move on to Tn+1
+
+
+-----------------------------------------------------------
+Just use a sexball probe:
+-----------------------------------------------------------
+
+I know I said above to do it manually first, or at least read through it all enough to understand it to the point where you will be able to interpret the results of an automated method
+without having to learn the hard way first, but once you do I recommend switching to an automated or semi-automated sensor such as the sexball probe.
+
+
+
+
+
 
