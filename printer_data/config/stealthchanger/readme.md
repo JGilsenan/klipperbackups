@@ -12,6 +12,11 @@ IMPORTANT NOTES:
 - Ensure that your printer has heat soaked for 1-2 hours and that the tool being used is heated to 150C for all of these steps.
 - Ensure that your nozzles are all clean, this only works as well as your nozzles are clean!
 - When adjusting Z_Offset values, increasing the Z_Offset value LOWERS the nozzle, and decreasing the Z_Offset value RAISES the nozzle, this is the opposite of what intuition may suggest!
+- This guide assumes that the following strategy is used for tool Z_offsets:
+    - homing (and by extension QGL) will ALWAYS be done using T0, never by any other tool
+    - only T0 will have a non-zero value for Z_Offset, ALL OTHER TOOLS HAVE Z_Offset = 0
+    - gcode offsets are what is used to account for the offsets of T1-Tn, and these are offsets from T0
+    - as such, it is crucially important that you are careful and ensure you have the correct Z_Offset for T0, otherwise all of your tools will be off
 
 
 -----------------------------------------------------------
@@ -122,9 +127,51 @@ If you made it this far successfully, consider this a waypoint in your journey, 
 gcode offsets (of course leave the Z_Offset value for T0 alone!) and start over from this point!
 
 
+-----------------------------------------------------------
+Now for T1 through Tn:
+-----------------------------------------------------------
+
+Here's where it will begin to get confusing, as mentioned earlier:
+
+- T0 must be the only tool used for homing
+- T0 is the only tool that has a non-zero Z_Offset
+- all other tools will have a gcode Z offset and this is a value relative to T0
+
+So now we need to find that offset for each tool. Here are some notes before we begin:
+
+- I am adding a few "unnecessary" steps to ease in understanding what these offsets mean
+
+-----------------------------------------------------------
+Procedure for Tn:
+-----------------------------------------------------------
+
+Setup:
+
+- Ensure that the extruders for both T0 AND Tn are set to 150C and that your bed is heated and the printer heatsoaked
+- Manually place T0 on the carriage
+- Home, QGL, and home again
+- Now manually remove T0 from the carriage and replace with Tn
+- DO NOT HOME OR QGL
+
+The first thing we're going to do is to determine whether Tn's nozzle is position above, below, or equally on the Z axis
+
+- Command the toolhead to move to Z = 0mm and watch Tn on the carriage as it comes to a stop
+- If the nozzle of Tn made contact with the bed and the toolhead slid upwards along the tap mechanism, then Tn's nozzle sits BELOW T0's nozzle
+- If the nozzle of Tn did not contact the bed and there is any gap between the nozzle and the bed then Tn's nozzle sits ABOVE T0's nozzle
+- In the rare case that Tn's nozzle just contacts the bed but the tap sensor has not triggered, and there is no gap, then congratulations, you can stop here, your
+  gcode Z offset for Tn is 0mm
+
+While this step is not entirely necessary, it is a good sanity check, since it determines what the sign will be in front of your gcode Z offset:
+- if Tn's nozzle is BELOW T0's nozzle the sign is positive (+)
+- if Tn's nozzle is ABOVE T0's nozzle the sign is positive (-)
+
+A few important notes before continuing:
+- If you followed the steps above and triggered the tap sensor during the process it will be necessary for you to do the following before continuing:
+    - manually swap back to T0
+    - re-home using T0
+    - manually swap back to Tn
 
 
-
-
+Now to actually determine the offset:
 
 
