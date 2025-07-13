@@ -219,7 +219,7 @@ Babystepping to account for the paper:
 - There are a number of ways to do this, here is how I go about it (note that the other methods are likely more efficient, I simply like to see everything as it happens)
     - Create a test print in your slicer that only uses T0 and Tn, Ellis's test patches are a personal favorite to use, but sometimes I throw other test prints into the mix
     - Ensure that T0 is selected, is the first tool to be used in the print, and start the print
-    - It is important to have the print first print using T0 since this will identify issues such as a bad homing due to T0's nozzle being dirty and save you a lot of frustration
+    - It is important to have the print first print using T0 since this will identify issues such as a bad homing due to T0's nozzle being dirty and can save you a lot of frustration
     - If everything was setup correctly, your printer should work through your PRINT_START macro as normal using T0, then upon completing the startup procedure it will select Tn
     - BE READY TO ESTOP you don't want to find out too late that you made a decimal point error here!
     - Babystep your Z offset using the "fine tuning" menu until you have achieved a Z offset you like (good squish)
