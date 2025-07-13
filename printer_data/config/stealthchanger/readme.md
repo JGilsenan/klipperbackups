@@ -13,6 +13,7 @@ IMPORTANT NOTES:
 - Ensure that your nozzles are all clean, this only works as well as your nozzles are clean!
 - When adjusting Z_Offset values, increasing the Z_Offset value LOWERS the nozzle, and decreasing the Z_Offset value RAISES the nozzle, this is the opposite of what intuition may suggest!
 
+
 -----------------------------------------------------------
 Homing for the first time:
 -----------------------------------------------------------
@@ -115,7 +116,10 @@ Next, we can verify that our offsets are where we want them for T0
 - Assuming that all looks well at this point, command the Z position to the absolute value of the offset found while babystepping above, in our case ABS(-0.1mm) = 0.1mm
 - If everything was done correctly up until this point you should now be able to slide a paper under the nozzle with just the slightest amount of friction, just as it was when you initially
   set the Z_Offset using the `PROBE_CALIBRATE` procedure
-- If that is the case, excellent, you can move on, if not, then 
+- If that is the case, excellent, you can move on, if not, then unfortunately your best bet is to start from the top, being careful to follow directions exactly as written!
+
+If you made it this far successfully, consider this a waypoint in your journey, what I mean is that if you mess up at any point past this in the process you can simply erase all of your
+gcode offsets (of course leave the Z_Offset value for T0 alone!) and start over from this point!
 
 
 
