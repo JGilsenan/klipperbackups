@@ -7,6 +7,7 @@ Imagine you are setting up everything for a brand new build, you have T0 mounted
 
 Ensure that your printer has heat soaked for 1-2 hours and that the tool being used is heated to 150C for all of these steps.
 
+Ensure that your nozzles are all clean, this only works as well as your nozzles are clean!
 
 -----------------------------------------------------------
 Homing for the first time:
@@ -97,7 +98,18 @@ Now we're left with: what does that number mean and how do I save it?
 - Now, to arrive at the correct Z_Offset for our configuration we need to subtract our babystepping offset, -0.1mm, from our current Z_Offset, -0.6mm, -0.6mm - -0.1mm = -0.5mm
 - Our new Z_Offset for T0 is -0.5mm
 
-What this means is that now
+Now, update the Z_Offset for T0 in the configs, then save and restart, don't forget to set your extruder and bed temps again upon reboot, then home, QGL, and home again.
+
+- You should note now that after homing the Z position has changed from 9.4mm before when the Z_Offset was set to -0.6mm to 9.5mm now with a Z_Offset of -0.5mm.
+
+Next, we can verify that our offsets are where we want them for T0
+
+- Command the tool to Z = 0mm
+- The nozzle should be just touching the bed
+- You should not be able to slide a piece of paper under the nozzle
+- If there is a gap visible, or if the paper slides under the nozzle, a mistake was made and I recommend restarting from the top
+- Assuming that all looks well at this point, command the Z position to the absolute value of the offset found while babystepping above, in our case ABS(-0.1mm) = 0.1mm
+- If everything was done correctly up until this 
 
 
 
