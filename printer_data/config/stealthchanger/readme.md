@@ -5,6 +5,8 @@ The setup:
 -----------------------------------------------------------
 Imagine you are setting up everything for a brand new build, you have T0 mounted, and you have the z_offset set to 0.0 (as well as gcode offsets, but those are always 0 for T0)
 
+Ensure that your printer has heat soaked for 1-2 hours and that the tool being used is heated to 150C for all of these steps.
+
 
 -----------------------------------------------------------
 Homing for the first time:
