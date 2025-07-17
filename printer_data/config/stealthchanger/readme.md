@@ -241,7 +241,16 @@ Just use a sexball probe:
 I know I said above to do it manually first, or at least read through it all enough to understand it to the point where you will be able to interpret the results of an automated method
 without having to learn the hard way first, but once you do I recommend switching to an automated or semi-automated sensor such as the sexball probe.
 
+TODO: STOPPED HERE
+TODO: STOPPED HERE
+TODO: STOPPED HERE
+TODO: STOPPED HERE
+TODO: STOPPED HERE
+TODO: STOPPED HERE
+TODO: STOPPED HERE
+TODO: STOPPED HERE
 
+probably just remove the Tn calibration section, it doesn't even make sense to do it, just use a sexball probe
 
 
 
