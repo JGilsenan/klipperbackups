@@ -150,107 +150,15 @@ Here's where it will begin to get confusing, as mentioned earlier:
 - T0 is the only tool that has a non-zero Z_Offset
 - all other tools will have a gcode Z offset and this is a value relative to T0
 
-So now we need to find that offset for each tool. Here are some notes before we begin:
-
-- I am adding one or two "unnecessary" steps to ease in understanding what these offsets mean
-- Though it may be quicker to try and do this for multiple toolheads simultaneously, the first time you are probably better off completing the entire process for each extra toolhead beyond T0
-
-
 -----------------------------------------------------------
-Procedure for Tn:
+Just use a sexball probe or similar:
 -----------------------------------------------------------
 
-Setup:
-
-- Ensure that the extruders for both T0 AND Tn are set to 150C and that your bed is heated and the printer heatsoaked
-- Manually place T0 on the carriage
-- Home, QGL, and home again
-- Now manually remove T0 from the carriage and replace with Tn
-- DO NOT HOME OR QGL
-
-The first thing we're going to do is to determine whether Tn's nozzle is position above, below, or equally on the Z axis
-
-- Command the toolhead to move to Z = 0mm and watch Tn on the carriage as it comes to a stop
-- If the nozzle of Tn made contact with the bed and the toolhead slid upwards along the tap mechanism, then Tn's nozzle sits BELOW T0's nozzle
-- If the nozzle of Tn did not contact the bed and there is any gap between the nozzle and the bed then Tn's nozzle sits ABOVE T0's nozzle
-- In the rare case that Tn's nozzle just contacts the bed but the tap sensor has not triggered, and there is no gap, then congratulations, you can stop here, your
-  gcode Z offset for Tn is 0mm
-
-While this step is not entirely necessary, it is a good sanity check, since it determines what the sign will be in front of your gcode Z offset:
-- if Tn's nozzle is BELOW T0's nozzle the sign is positive (+)
-- if Tn's nozzle is ABOVE T0's nozzle the sign is positive (-)
-- Think of it as a positive gcode offset means that you need to move Tn on the Z axis in the positive Z direction (up) in order to have the nozzle be at the print surface and 
-  a negative gcode offset means that you need to move Tn on the Z axis in the negative direction (down) in order to have the nozzle be at the print surface
-
-A few important notes before continuing:
-- If you followed the steps above and triggered the tap sensor during the process it will be necessary for you to do the following before continuing:
-    - manually swap back to T0
-    - re-home using T0
-    - manually swap back to Tn
-- There are a number of techniques to determining these offsets, and you will see that a lot of folks are using a touchpoint-type (ie sexbolt or "sexball") sensors for this purpose, I myself
-  use a "sexball" probe and use the automated macros that come as part of klipper toolchanger to determine gcode offsets
-- While extra sensors and probes are useful and really quite convenient compared to the manual approach, I personally found them to only really be valuable tools once I fully understood what
-  the offsets are, what they represent, and how to measure them, so even if you plan to use another sensor for this I believe there is value in using this guide to understand it all, if for 
-  no other reason use what you find here to perform your sanity checks and verifications that the offsets you entered are good.
-
-Now to actually determine the offset:
-- Assuming that you have homed with T0 and manually swapped Tn back on as starting conditions
-- Command the tool to Z = 10mm (or another value that will for sure result in a nozzle above the print surface)
-- With a piece of paper ready, manually move the toolhead down along the Z axis until you have positioned the nozzle such that you can still move a piece of paper between it and the bed,
-  with the same slight amount of friction as you encountered above, this doesn't need to be super precise, again because we have to account for the paper
-- In my case, I determined in the check above that Tn's nozzle sits below T0's (so positive gcode offset), and arrived at an offset here of 0.6mm
-- Once here, go to Tn's config and set the gcode_z_offset value to the value found in the steps above, recalling the notes about signs
-- Manually swap back to T0, save your config which restarts klipper, ensure your temps are all set again after restarting
-
-A few quick notes about gcode offsets:
-- These are offsets that get applied during the tool change process
-- Recall that they are the offset relative to T0
-- Recall that this is why you must always home with T0 (following this guide, at least)
-- What this all translates to is, examine the following scenario: you start a print with T0 selected, T0 finishes all of its printing for the current layer and a toolchange occurs selecting T1
-    - When T1 is selected, the toolchanger looks at the gcode_z_offset value and applies it as an offset to Z positions while this tool is selected
-    - If you have ever used the "fine tuning" menu mid print to adjust Z offsets, the gcode_z_offset is applied to the current Z position in the same way as your printer applies offsets set
-      using the fine tuning menu
-    - You can see this happening as your print executes, when you start with T0, you can open the "fine tuning" menu and see that there is no offset being applied, however open the menu again
-      once the toolchange occurs and Tn is selected and you will see the value you entered under gcode_z_offset listed there as being applied currently to Z positions
-          - This in particular is useful for babystepping Tn
-
-Babystepping to account for the paper:
-- Once again we need to babystep to account for the paper in the process above
-- There are a number of ways to do this, here is how I go about it (note that the other methods are likely more efficient, I simply like to see everything as it happens)
-    - Create a test print in your slicer that only uses T0 and Tn, Ellis's test patches are a personal favorite to use, but sometimes I throw other test prints into the mix
-    - Ensure that T0 is selected, is the first tool to be used in the print, and start the print
-    - It is important to have the print first print using T0 since this will identify issues such as a bad homing due to T0's nozzle being dirty and can save you a lot of frustration
-    - If everything was setup correctly, your printer should work through your PRINT_START macro as normal using T0, then upon completing the startup procedure it will select Tn
-    - BE READY TO ESTOP you don't want to find out too late that you made a decimal point error here!
-    - Babystep your Z offset using the "fine tuning" menu until you have achieved a Z offset you like (good squish)
-    - Here's my favorite part, because the way that gcode_z_offset is applied by the toolchanger is the same as how the "fine tuning" menu does it, the value displayed once you dial it in
-      is the new value that you need to enter under Tn for gcode_z_offset, note this value somewhere
-    - Next, cancel the print or let it finish, your choice, and use the toolchanger to select T0 again if it did not do so as part of your PRINT_END macro
-    - Now go to your configs, update the gcode_z_offset value for Tn, then save and restart the printer, making sure to set your temps again
-
-Don't forget the sanity check print:
-- You could stop here, but I personally don't enjoy surprises, so I do a sanity check print
-- I typically use the same job as I did for babystepping above, and rerun it while I watch to make sure I didn't accidentally enter the wrong gcode_z_offset
-- Once this has been confirmed, congrats, you can move on to Tn+1
-
-
------------------------------------------------------------
-Just use a sexball probe:
------------------------------------------------------------
-
-I know I said above to do it manually first, or at least read through it all enough to understand it to the point where you will be able to interpret the results of an automated method
-without having to learn the hard way first, but once you do I recommend switching to an automated or semi-automated sensor such as the sexball probe.
-
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-TODO: STOPPED HERE
-
-probably just remove the Tn calibration section, it doesn't even make sense to do it, just use a sexball probe
+Before writing this I wrote up an entire section on how to do the T1-Tn gcode offsets manually, even though I myself use a sexball probe, it was a fun exercise to try and capture the nuance of 
+doing this part manually, and while the instructions worked, and resulted in valid offsets that could be printed on, I did a number of comparison tests which led me to the conclusion that you
+should just use a sexball probe or similar. The automated probing, or semi-automated probing that you can do with a sexball or similar is simply better at determining offsets, far more repeatable,
+and considerably faster. Along the way I was frustrated by slop in my first assembly of the probe and ended up rebuilding it a few times with varying degrees of improvement or degradation of the
+results, and even with my sloppiest probe the results were still consistently better than manually calculating the offsets. 
 
 
 
